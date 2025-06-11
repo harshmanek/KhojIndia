@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { verifyAccessToken } from "../utils/token.utils";
 
 declare global {
     namespace Express {
@@ -19,30 +20,22 @@ interface DecodedToken {
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
-    // Get token from header
-    const authHeader = req.header("Authorization");
-    if (!authHeader){
-        res.status(401).json({ message: "No Token, authorization denied" });
-        return;
-    }
-    const token = authHeader.split(" ")[1];
-
-    if (!token) {
-        res.status(401).json({ message: "No token, authorization denied" });
-        return;
-    }
-    // Verify token
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as DecodedToken;
+        const accessToken = req.cookies.accessToken;
+        if(!accessToken)return res.status(401).json({message:"No access token provided"});
 
-        // Attach user to the request object
+        const decoded = verifyAccessToken(accessToken)as any;
+        if(!decoded){
+            return res.status(401).json({message:"Invalid access token "});
+        }
         req.user = {
-            id: decoded.userId,
-            role: decoded.userRole,
+            id:decoded.userId,
+            role:decoded.userRole
         };
         next();
-    } catch (err) {
-        console.error("Token verification Failed: ", err);
-        res.status(401).json({ message: "Token is not valid" });
+    } catch (error) {
+        console.error("Auth middleware error:", error);
+        res.status(401).json({ message: "Authentication failed" });
+    }
     }
 };
