@@ -15,7 +15,7 @@ declare global {
 }
 const prisma = new PrismaClient();
 
-export const createBooking = async (req: Request, res: Response) => {
+export const createBooking = async (req: Request, res: Response): Promise<void> => {
     try {
         // booking an appointment
         // we need to take the booking details from the request body
@@ -28,13 +28,16 @@ export const createBooking = async (req: Request, res: Response) => {
         // based on the experience id the user is allowed to make a payment for it
         // on successful payment the booking is done and booking id is generated
         if (!req.user || req.user.role !== Role.TRAVELLER) {
-            return res.status(403).json({ message: `Forbidden only travellers can make bookings` })
+            res.status(403).json({ message: `Forbidden only travellers can make bookings` })
+            return;
         }
         const { experienceId, bookingDate } = req.body;
         const travellerId = req.user.id;
 
         const experience = await prisma.experience.findUnique({ where: { id: experienceId } });
-        if (!experience) return res.status(404).json({ message: "No Experiences with the given id found" });
+        if (!experience) {
+            res.status(404).json({ message: "No Experiences with the given id found" }); return;
+        }
 
         const booking = await prisma.booking.create({
             data: {
@@ -46,10 +49,11 @@ export const createBooking = async (req: Request, res: Response) => {
                 traveller: true, experience: true
             }
         });
-        return res.status(201).json(booking);
+        res.status(201).json(booking);
     } catch (error) {
         console.error("Error creating booking:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error" });
+        return;
     }
 };
 
@@ -96,7 +100,7 @@ export const getAllBookings = async (req: Request, res: Response) => {
         else {
             return res.status(403).json({ message: "Forbidden: Invalid role for this action" })
         }
-        return res.status(200).json(bookings);
+        res.status(200).json(bookings);
     } catch (error) {
         console.error("Error fetching bookings: ", error);
         return res.status(500).json({ message: "Internal server error" });
@@ -133,7 +137,7 @@ export const getBookingById = async (req: Request, res: Response) => {
             return res.status(403).json({ message: "Unauthorised you are not the host for this experience" });
         }
         //    admin can view all the bookings
-        return res.status(200).json(booking);
+        res.status(200).json(booking);
     } catch (error) {
         console.error("Error fetching booking by ID:", error);
         return res.status(500).json({ message: "Internal server error" });
@@ -171,7 +175,7 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
             data: { status: status as BookingStatus },
             include: { traveller: true, experience: true }
         });
-        return res.status(200).json(updatedBooking);
+        res.status(200).json(updatedBooking);
     } catch (error) {
         console.error("Error updating booking system:", error);
         return res.status(500).json({ message: "Internal server error" });
@@ -201,7 +205,7 @@ export const deleteBooking = async (req: Request, res: Response) => {
             return res.status(403).json({ message: "Forbidden: Confirmed bookings cannot be deleted by the travellers or hosts." });
         }
         await prisma.booking.delete({ where: { id } });
-        return res.status(204).send();
+        res.status(204).send();
     } catch (error) {
         console.error("Error deleting booking:", error);
         return res.status(500).json({ message: "Internal server error" });

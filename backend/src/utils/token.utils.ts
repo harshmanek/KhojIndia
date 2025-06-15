@@ -41,7 +41,7 @@ export const setTokens = (res: any, accessToken: string, refreshToken: string) =
 
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'refreshToken',
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7d
     })
 }

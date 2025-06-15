@@ -2,9 +2,10 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import authRoutes from "./routes/auth.routes";
-import experienceRoutes from "./routes/experiences.route";
+import experienceRoutes from "./routes/experiences.routes";
 import bookingRoutes from "./routes/booking.routes";
 import cookieParser from "cookie-parser"
+import paymentRoutes from "./routes/payment.routes";
 
 const app = express();
 
@@ -41,6 +42,6 @@ app.use('/api/experiences', experienceRoutes);
 // apis for bookings
 app.use('/api/booking',bookingRoutes);
 
-
+app.use('/api/payment',paymentRoutes);
 
 export default app;

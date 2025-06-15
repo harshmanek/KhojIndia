@@ -18,6 +18,7 @@ model User {
   id          String       @id @default(uuid())
   firstname   String
   lastname    String
+  phone       String
   email       String       @unique
   password    String
   role        Role         @default(TRAVELLER)
@@ -56,15 +57,18 @@ model Booking {
 }
 
 model Payment {
-  id         String   @id @default(uuid())
-  amount     Float
-  method     String
-  booking    Booking  @relation(fields: [bookingId], references: [id])
-  bookingId  String @unique
-  razorPayId String
-  status     String
-  paidAt     DateTime
-  createdAt  DateTime @default(now())
+  id                String        @id @default(uuid())
+  amount            Float
+  method            String
+  booking           Booking       @relation(fields: [bookingId], references: [id])
+  bookingId         String        @unique
+  razorpayOrderId   String        @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+  status            PaymentStatus @default(PENDING)
+  paidAt            DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 }
 
 enum Role {
@@ -77,4 +81,10 @@ enum BookingStatus {
   PENDING
   CONFIRMED
   CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
 }

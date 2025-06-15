@@ -22,20 +22,21 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
     try {
         const accessToken = req.cookies.accessToken;
-        if(!accessToken)return res.status(401).json({message:"No access token provided"});
+        if (!accessToken) { res.status(401).json({ message: "No access token provided" }); return; }
 
-        const decoded = verifyAccessToken(accessToken)as any;
-        if(!decoded){
-            return res.status(401).json({message:"Invalid access token "});
+        const decoded = verifyAccessToken(accessToken) as any;
+        if (!decoded) {
+            res.status(401).json({ message: "Invalid access token " });
+            return;
         }
         req.user = {
-            id:decoded.userId,
-            role:decoded.userRole
+            id: decoded.userId,
+            role: decoded.userRole
         };
         next();
     } catch (error) {
         console.error("Auth middleware error:", error);
         res.status(401).json({ message: "Authentication failed" });
     }
-    }
-};
+}
+
