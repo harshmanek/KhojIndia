@@ -10,7 +10,10 @@ export const createExperience = async (req: Request, res: Response) => {
         // check if the user is available and the user is also a Host so that he can only create experiences
         // retrive the id of the user from the request and assign it to the hostId of the experience.
         // using that id the experience will be created
-        if (!req.user || req.user.role !== Role.HOST) return res.status(403).json({ message: "Forbidden: Only hosts can create experiences" });
+        if (!req.user || req.user.role !== Role.HOST) {
+            res.status(403).json({ message: "Forbidden: Only hosts can create experiences" });
+            return;
+        }
 
         const { title, description, location, price, imageUrl, date } = req.body;
         const hostId = req.user.id;
@@ -31,11 +34,11 @@ export const createExperience = async (req: Request, res: Response) => {
                 }
             }
         });
-        return res.status(201).json(experience);
+        res.status(201).json(experience);
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -56,10 +59,10 @@ export const getAllExperiences = async (req: Request, res: Response) => {
                 }
             }// include host details
         });
-        return res.status(200).json(experiences);
+        res.status(200).json(experiences);
     } catch (error) {
         console.error("Error fetching all experiences:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -75,12 +78,12 @@ export const getExperienceById = async (req: Request, res: Response) => {
         });
 
         if (!experience) {
-            return res.status(404).json({ message: "Experience not found" });
+            res.status(404).json({ message: "Experience not found" });
         }
-        return res.status(200).json(experience);
+        res.status(200).json(experience);
     } catch (error) {
         console.error("Error fetching experience by ID:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -95,16 +98,18 @@ export const updateExperience = async (req: Request, res: Response) => {
         const { title, description, location, price, imageUrl, date } = req.body;
 
         if (!req.user || (req.user.role !== Role.HOST && req.user.role !== Role.ADMIN)) {
-            return res.status(403).json({ message: `Forbidden only hosts and admin can update experiences.` });
+            res.status(403).json({ message: `Forbidden only hosts and admin can update experiences.` });
+            return;
         }
         const existingExperience = await prisma.experience.findUnique({
             where: { id }
         });
         if (!existingExperience) {
-            return res.status(404).json({ message: "Experience not found" });
+            res.status(404).json({ message: "Experience not found" });
+            return;
         }
         if (req.user.role === Role.HOST && existingExperience.hostId !== req.user.id) {
-            return res.status(403).json({
+            res.status(403).json({
                 message: "Forbidden: You are not the host of this experience."
             });
         }
@@ -119,10 +124,10 @@ export const updateExperience = async (req: Request, res: Response) => {
                 date: date ? new Date(date) : undefined,
             }
         });
-        return res.status(200).json(updateExperience);
+        res.status(200).json(updateExperience);
     } catch (error) {
         console.error("Error updating experience:", error);
-        return res.status(500).json({ message: "Internal Server error" });
+        res.status(500).json({ message: "Internal Server error" });
     }
 };
 
@@ -136,19 +141,21 @@ export const deleteExperience = async (req: Request, res: Response) => {
         const { id } = req.params;
 
         if (!req.user || (req.user.role !== Role.HOST && req.user.role !== Role.ADMIN)) {
-            return res.status(403).json({ message: "Forbidden: Only hosts or admins can delete experience" });
+            res.status(403).json({ message: "Forbidden: Only hosts or admins can delete experience" });
+            return;
         }
         const existingExperience = await prisma.experience.findUnique({ where: { id } });
         if (!existingExperience) {
-            return res.status(404).json({ message: "Experience not found " });
+            res.status(404).json({ message: "Experience not found " });
+            return;
         }
         if (req.user.role === Role.HOST && existingExperience.hostId !== id) {
-            return res.status(403).json({ message: "Forbidden: You are not the owner of this experience" });
+            res.status(403).json({ message: "Forbidden: You are not the owner of this experience" });
         }
         await prisma.experience.delete({ where: { id } });
-        return res.status(204).send();
+        res.status(204).send();
     } catch (error) {
         console.error("Error deleting experience:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error" });
     }
 }

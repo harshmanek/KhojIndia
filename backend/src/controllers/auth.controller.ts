@@ -1,16 +1,22 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { PrismaClient, Role } from "../generated/prisma";
-import { generateToken } from "../utils/jwt";
 import { clearTokens, generateTokens, setTokens, verifyAccessToken } from "../utils/token.utils";
 import jwt from "jsonwebtoken";
 const prisma = new PrismaClient();
 
 export const register = async (req: Request, res: Response) => {
     try {
-        const { firstname, lastname, email, password, role } = req.body;
+        const { firstname, lastname, email, password, role, phone } = req.body;
 
+        if (!firstname || !lastname || !email || !password || !phone) {
+            res.status(400).json({ message: "All fields are required" });
+        }
 
+        const phoneRegex = /^\+?[\d\s\-\(\)]+$/;
+        if (!phoneRegex.test(phone)) {
+            res.status(400).json({ message: "Invalid phone number format" });
+        }
         const existingUser = await prisma.user.findUnique({ where: { email } });
 
         if (existingUser) return res.status(400).json({ message: "User already exists" });
@@ -23,7 +29,8 @@ export const register = async (req: Request, res: Response) => {
                 lastname,
                 email,
                 password: hashedPassword,
-                role
+                role,
+                phone
             }
         });
 
@@ -36,6 +43,7 @@ export const register = async (req: Request, res: Response) => {
                 firstname: user.firstname,
                 lastname: user.lastname,
                 email: user.email,
+                phone: user.phone,
                 role: user.role
             }
         });
@@ -63,6 +71,7 @@ export const login = async (req: Request, res: Response) => {
                 firstname: user.firstname,
                 lastname: user.lastname,
                 email: user.email,
+                phone: user.phone,
                 role: user.role
             }
         });
@@ -108,6 +117,7 @@ export const refresh = async (req: Request, res: Response) => {
                 firstname: user.firstname,
                 lastname: user.lastname,
                 email: user.email,
+                phone: user.phone,
                 role: user.role
             }
         });
