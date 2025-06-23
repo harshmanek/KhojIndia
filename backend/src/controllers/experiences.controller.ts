@@ -79,6 +79,7 @@ export const getExperienceById = async (req: Request, res: Response) => {
 
         if (!experience) {
             res.status(404).json({ message: "Experience not found" });
+            return;
         }
         res.status(200).json(experience);
     } catch (error) {
@@ -112,6 +113,7 @@ export const updateExperience = async (req: Request, res: Response) => {
             res.status(403).json({
                 message: "Forbidden: You are not the host of this experience."
             });
+            return;
         }
         const updatedExperience = await prisma.experience.update({
             where: { id },
@@ -124,7 +126,7 @@ export const updateExperience = async (req: Request, res: Response) => {
                 date: date ? new Date(date) : undefined,
             }
         });
-        res.status(200).json(updateExperience);
+        res.status(200).json(updatedExperience);
     } catch (error) {
         console.error("Error updating experience:", error);
         res.status(500).json({ message: "Internal Server error" });
@@ -151,6 +153,7 @@ export const deleteExperience = async (req: Request, res: Response) => {
         }
         if (req.user.role === Role.HOST && existingExperience.hostId !== id) {
             res.status(403).json({ message: "Forbidden: You are not the owner of this experience" });
+            return;
         }
         await prisma.experience.delete({ where: { id } });
         res.status(204).send();

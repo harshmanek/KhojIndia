@@ -15,7 +15,7 @@ declare global {
 
 interface DecodedToken {
     userId: string;
-    userRole: string;
+    role: string;
 }
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -29,9 +29,10 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
             res.status(401).json({ message: "Invalid access token " });
             return;
         }
+        // console.log(" decoded userid: ", decoded.userId, " decoded role: ", decoded.role);
         req.user = {
             id: decoded.userId,
-            role: decoded.userRole
+            role: decoded.role
         };
         next();
     } catch (error) {

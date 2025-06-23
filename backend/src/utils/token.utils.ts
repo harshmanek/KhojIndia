@@ -5,10 +5,11 @@ import { token } from "morgan";
 
 const prisma = new PrismaClient();
 
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'access_secret';
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'refresh_secret';
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'harsh';
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'manek';
 
 export const generateTokens = (userId: string, role: string) => {
+    // console.log(" userid: ", userId, " role: ", role);
     const accessToken = jwt.sign({ userId, role }, ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
     const refreshToken = jwt.sign({ userId, role }, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
     return { accessToken, refreshToken };
@@ -31,7 +32,7 @@ export const verifyRefreshToken = (token: string) => {
 }
 
 export const setTokens = (res: any, accessToken: string, refreshToken: string) => {
-    
+
     res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENC === 'production',
@@ -51,4 +52,4 @@ export const clearTokens = (res: any) => {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
 
-};1
+}; 1

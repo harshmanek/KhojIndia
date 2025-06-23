@@ -64,6 +64,7 @@ export const getAllBookings = async (req: Request, res: Response) => {
                 message: "Unauthorized"
             });
         let bookings;
+        console.log("User role: ",req.user.role,"Type : " ,typeof req.user.role);
         // admin can view all the bookings
         if (req.user.role === Role.ADMIN) {
             bookings = await prisma.booking.findMany({
