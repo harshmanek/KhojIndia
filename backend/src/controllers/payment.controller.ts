@@ -27,7 +27,7 @@ export const createPaymentOrder = async (req: Request, res: Response) => {
         if (booking.status !== "PENDING") {
             return res.status(400).json({ message: "Booking is not in pending state" });
         }
-        const receipt=  `booking_${bookingId}`.slice(0,40);// we need to truncate the booking id to limit the length of the receipt for razorpay to be in 40 characters
+        const receipt = `booking_${bookingId}`.slice(0, 40);// we need to truncate the booking id to limit the length of the receipt for razorpay to be in 40 characters
 
         // Creating Razorpay order
         const options = {
@@ -102,8 +102,19 @@ export const verifyPayment = async (req: Request, res: Response) => {
             data: { status: 'CONFIRMED' }
         })
 
+        const updatedPayment = await prisma.payment.findUnique({
+            where: { id: paymentId },
+            include: {
+                booking: {
+                    include: {
+                        experience: true,
+                        traveller: true,
+                    },
+                },
+            },
+        });
         // send invoice email
-        await generateAndSendInvoice(payment);
+        await generateAndSendInvoice(updatedPayment!);
         res.json({
             success: true,
             message: 'Payment verified successfully',
