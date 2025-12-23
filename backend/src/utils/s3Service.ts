@@ -21,7 +21,7 @@ export const uploadToS3 = async(fileBuffer:Buffer,fileName:string):Promise<strin
         });
         await s3Client.send(command);
         
-        // Generate a sifgned URL that expires in 7 days
+        // Generate a signed URL that expires in 7 days
         const getCommand = new GetObjectCommand({
             Bucket:BUCKET_NAME,
             Key:fileName

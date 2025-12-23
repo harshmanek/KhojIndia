@@ -55,7 +55,7 @@ model Booking {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
-
+i
 model Payment {
   id                String        @id @default(uuid())
   amount            Float

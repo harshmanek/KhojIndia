@@ -57,7 +57,7 @@ export const generateAndSendInvoice = async (payment: Payment & {
 
         doc.on('data', (chunk) => invoiceBuffer.push(chunk));
 
-        doc.rect(40, 40, 520, 700).stroke(); // this draws a border
+        doc.rect(40, 40, 520, 700).stroke(); // drawing a border
 
         doc.fillColor('#2E86C1').fontSize(28).font('Helvetica-Bold').text('KhojIndia Booking Invoice', { align: "center", underline: true });
         // Add contend to PDF

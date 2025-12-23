@@ -1,7 +1,7 @@
 import React from "react";
 import RazorpayCheckout from "../components/RazorpayCheckout";
 const Checkout = (data) => {
-  const bookingId = "97116fc4-7967-4b65-8c44-1549d0b29fa8";
+  const bookingId = "9e817744-dfa7-4807-8b09-5741bb046615";
   const amount = 10000;
 
   const handleSuccess = (data) => {

@@ -9,6 +9,7 @@ import AuthLoader from "./components/AuthLoader";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import LogoutButton from "./components/LogoutButton";
+import Experiences from "./pages/Experiences";
 
 function App() {
   return (
@@ -22,7 +23,8 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="logout" element={<LogoutButton/>}/>
+              <Route path="logout" element={<LogoutButton />} />
+              <Route path="/experiences" element={<Experiences />} />
               {/* <Route path="/unauthorized" element={<Unauthorised />} /> */}
               {/* <Route
                 path="/dashboard"
